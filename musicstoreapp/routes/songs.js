@@ -16,6 +16,7 @@ module.exports = function (app) {
         let response = 'id: ' + req.params.id;
         res.send(response);
     });
+
     app.get('/songs/:kind/:id', function(req, res) {
         let response = 'id: ' + req.params.id + '<br>'
             + 'Tipo de música: ' + req.params.kind;
