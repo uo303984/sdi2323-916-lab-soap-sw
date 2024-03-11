@@ -1,8 +1,24 @@
 module.exports = function (app){
     let authors = [{
-        "name:":"Eric",
+        "name":"Eric",
         "group":"Eric",
         "rol":"Cantante"
+    },{
+        "name":"Antonio",
+        "group":"Grupo1",
+        "rol":"Batería"
+    },{
+        "name":"Mnauel",
+        "group":"Grupo2",
+        "rol":"Batería"
+    },{
+        "name":"Sofía",
+        "group":"Grupo3",
+        "rol":"Batería"
+    },{
+        "name":"Samuel",
+        "group":"Grupo4",
+        "rol":"Guitarrista"
     }];
     app.get("/authors",function (req,res){
         let response = {
@@ -53,6 +69,13 @@ module.exports = function (app){
             response += "role no enviado en la petición" + "<br>";
         }
         res.send(response);
+    });
+    app.get("/authors/filter/:rol", function (req, res) {
+        let response = {
+            seller: "Autores",
+            authors: authors.filter(author => author.rol.toLowerCase().trim() === req.params.rol.toLowerCase().trim())
+        };
+        res.render("authors/authors.twig", response);
     });
     app.get("/authors/*", function (req, res) {
         res.redirect("/authors");
