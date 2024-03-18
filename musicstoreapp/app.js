@@ -17,7 +17,10 @@ const { MongoClient } = require("mongodb");
 const url = 'mongodb+srv://admin:sdi@musicstoreapp.gotkwse.mongodb.net/?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 const dbClient = new MongoClient(url);
-require("./routes/songs.js")(app, dbClient);
+let songsRepository = require("./repositories/songsRepository.js");
+songsRepository.init(app, dbClient);
+
+require("./routes/songs.js")(app, songsRepository);
 
 
 
