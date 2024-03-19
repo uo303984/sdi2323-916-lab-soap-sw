@@ -30,6 +30,8 @@
                         <div class="small">{{ song.author }} </div>
                         <div class="text-right">{{ song.price }} €</div>
                     </a>
+                    <!-- Enlace para agregar a favoritos -->
+                    <a href="/songs/favourites/add/{{ song._id }}" class="btn btn-primary">Agregar a favoritos</a>
                 </div>
             </div>
         {% endfor %}

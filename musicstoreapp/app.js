@@ -40,14 +40,19 @@ const dbClient = new MongoClient(url);
 
 const userSessionRouter = require('./routes/userSessionRouter');
 const userAudiosRouter = require('./routes/userAudiosRouter');
+app.use('/songs/favourites', userSessionRouter);
 app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter)
 
+
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, dbClient);
 
+let favouriteSongsRepository = require("./repositories/favouriteSongsRepository.js");
+favouriteSongsRepository.init(app,dbClient);
+require("./routes/favourites.js")(app,favouriteSongsRepository,songsRepository);
 require("./routes/songs.js")(app, songsRepository);
 
 

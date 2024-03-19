@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+{% block title %} Favoritos – uoMusic {% endblock %}
+{% block main_container %}
+  <h2>Favoritos</h2>
+  <ul>
+    {% for favourite in favourites %}
+      <li>
+        {{ favourite.title }} - {{ favourite.price }} €
+        <a href="/songs/favourites/delete/{{ favourite._id }}" class="btn btn-danger">Eliminar de favoritos</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <p>Precio total: {{ totalPrice }} €</p>
+{% endblock %}
