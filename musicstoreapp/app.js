@@ -43,6 +43,8 @@ const userAudiosRouter = require('./routes/userAudiosRouter');
 app.use('/songs/favourites', userSessionRouter);
 app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
+app.use("/songs/buy",userSessionRouter);
+app.use("/purchases",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter)
 
@@ -89,6 +91,7 @@ app.use(function(req, res, next) {
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
+  console.log("Se ha producido un error" + err);
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
