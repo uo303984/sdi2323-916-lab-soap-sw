@@ -6,14 +6,13 @@ userAudiosRouter.use(function (req, res, next) {
     console.log("routerAudios");
     let path = require('path');
     let songId = path.basename(req.originalUrl, '.mp3');
-    let filter = {_id: new ObjectId(songId)};
+    let filter = {_id: ObjectId(songId)};
     songsRepository.findSong(filter, {}).then(song => {
         if (req.session.user && song.author == req.session.user) {
             next();
         } else {
-            //res.redirect("/shop");
-            let filter = {user: req.session.user, song_id: new ObjectId(songId)};
-            let options = {projection: {_id: 0, song_id: 1}};
+            let filter = {user: req.session.user, songId: ObjectId(songId)};
+            let options = {projection: {_id: 0, songId: 1}};
             songsRepository.getPurchases(filter, options).then(purchasedIds => {
                 if (purchasedIds !== null && purchasedIds.length > 0) {
                     next();
@@ -28,4 +27,4 @@ userAudiosRouter.use(function (req, res, next) {
         res.redirect("/shop");
     });
 });
-module.exports = userAudiosRouter
+module.exports = userAudiosRouter;

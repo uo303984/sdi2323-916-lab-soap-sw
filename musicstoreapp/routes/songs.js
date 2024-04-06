@@ -109,55 +109,10 @@ module.exports = function (app,songsRepository) {
         let response = parseInt(req.query.num1) + parseInt(req.query.num2);
         res.send(String(response));
     })
-    app.get('/songs/:id', function(req, res) {
-        let filter = {_id: new ObjectId(req.params.id)};
-        let options = {};
-        songsRepository.findSong(filter, options).then(song => {
-            res.render("songs/song.twig", {song: song});
-        }).catch(error => {
-            res.send("Se ha producido un error al buscar la canción " + error)
-        });
 
-    });
 
-    app.get('/songs/:kind/:id', function(req, res) {
-        let response = 'id: ' + req.params.id + '<br>'
-            + 'Tipo de música: ' + req.params.kind;
-        res.send(response);
-    });
-    app.get('/purchases', function (req, res) {
-        let filter = {user: req.session.user};
-        let options = {projection: {_id: 0, song_id: 1}};
-        songsRepository.getPurchases(filter, options).then(purchasedIds => {
-            const purchasedSongs = purchasedIds.map(song => song.song_id);
-            let filter = {"_id": {$in: purchasedSongs}};
-            let options = {sort: {title: 1}};
-            songsRepository.getSongs(filter, options).then(songs => {
-                res.render("purchase.twig", {songs: songs});
-            }).catch(error => {
-                res.send("Se ha producido un error al listar las publicaciones del usuario: " + error)
-            });
-        }).catch(error => {
-            res.send("Se ha producido un error al listar las canciones del usuario " + error)
-        });
-    })
 
-    app.post('/songs/buy/:id', function (req, res) {
-        let songId = new ObjectId(req.params.id);
-        let shop = {
-            user: req.session.user,
-            song_id: songId
-        }
-        songsRepository.buySong(shop).then(result => {
-            if (result.insertedId === null || typeof (result.insertedId) === undefined) {
-                res.send("Se ha producido un error al comprar la canción")
-            } else {
-                res.redirect("/purchases");
-            }
-        }).catch(error => {
-            res.send("Se ha producido un error al comprar la canción " + error)
-        })
-    });
+
 
 
 
@@ -235,6 +190,92 @@ module.exports = function (app,songsRepository) {
         }
     };
 
+    app.get('/songs/:id', function(req, res) {
+        let filter = {_id: new ObjectId(req.params.id)};
+        let options = {};
+        songsRepository.findSong(filter, options).then(song => {
+            console.log(req.params.id);
+            userCanBuy(req.params.id,req.session.user, function(canBuy) {
+                console.log(canBuy);
+                res.render("songs/song.twig", {song: song, canBuy: canBuy});
+            });
+        }).catch(error => {
+            res.send("Se ha producido un error al buscar la canción " + error)
+        });
+    });
+
+    app.get('/songs/buy/:id', function(req, res) {
+        let songId = req.params.id;
+        let user = req.session.user;
+
+        userCanBuy(songId, user, function(canBuy, message) {
+            if (canBuy) {
+                let shop = {
+                    user: user,
+                    song_id: songId
+                };
+
+                // El usuario puede comprar la canción
+                songsRepository.buySong(shop).then(result => {
+                    if (result.insertedId === null || typeof (result.insertedId) === undefined) {
+                        res.send("Se ha producido un error al comprar la canción");
+                    } else {
+                        res.redirect("/purchases");
+                    }
+                }).catch(error => {
+                    res.send("Se ha producido un error al comprar la canción " + error);
+                });
+            } else {
+                // El usuario no puede comprar la canción
+                res.send(message);
+            }
+        });
+    });
+
+
+    app.get('/songs/:kind/:id', function(req, res) {
+        let response = 'id: ' + req.params.id + '<br>'
+            + 'Tipo de música: ' + req.params.kind;
+        res.send(response);
+    });
+    app.get('/purchases', function (req, res) {
+        let filter = {user: req.session.user};
+        let options = {projection: {_id: 0, song_id: 1}};
+        songsRepository.getPurchases(filter, options).then(purchasedIds => {
+            const purchasedSongs = purchasedIds.map(song => song.song_id);
+            let filter = {"_id": {$in: purchasedSongs}};
+            let options = {sort: {title: 1}};
+            songsRepository.getSongs(filter, options).then(songs => {
+                res.render("purchase.twig", {songs: songs});
+            }).catch(error => {
+                res.send("Se ha producido un error al listar las publicaciones del usuario: " + error)
+            });
+        }).catch(error => {
+            res.send("Se ha producido un error al listar las canciones del usuario " + error)
+        });
+    })
+    function userCanBuy(songId, user, callback) {
+        // Comprobación: El autor no puede comprar su propia canción
+        songsRepository.findSong({ _id: songId, author: user }, {}).then(song => {
+            if (song) {
+                callback(false, "No puedes comprar tu propia canción");
+            } else {
+                // Comprobación: El usuario ya ha comprado la canción
+                songsRepository.getPurchases({ user: user, song_id: songId }, {}).then(purchases => {
+                    if (purchases.length > 0) {
+                        callback(false, "Ya has comprado esta canción");
+                    } else {
+                        // El usuario puede comprar la canción
+                        callback(true, null);
+                    }
+                }).catch(error => {
+                    callback(false, "Se ha producido un error al verificar las compras " + error);
+                });
+            }
+        }).catch(error => {
+            callback(false, "Se ha producido un error al verificar la canción " + error);
+        });
+    }
 
 
 };
