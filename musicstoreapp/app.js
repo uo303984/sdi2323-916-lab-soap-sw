@@ -9,6 +9,9 @@ var logger = require('morgan');
 
 
 var app = express();
+let jwt = require('jsonwebtoken');
+
+app.set('jwt', jwt);
 
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -33,6 +36,7 @@ app.set('crypto',crypto);
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 const { MongoClient } = require("mongodb");
 const url = 'mongodb+srv://admin:sdi@musicstoreapp.gotkwse.mongodb.net/?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
@@ -52,16 +56,26 @@ const userAuthorRouter = require('./routes/userAuthorRouter');
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
+const userTokenRouter = require('./routes/userTokenRouter');
+app.use("/api/v1.0/songs/", userTokenRouter);
+
 
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, dbClient);
+
+
+const usersRepository = require("./repositories/usersRepository.js");
+usersRepository.init(app, dbClient);
+require("./routes/users.js")(app, usersRepository);
+require("./routes/api/songsAPIv1.0.js")(app, songsRepository, usersRepository);
 
 let favouriteSongsRepository = require("./repositories/favouriteSongsRepository.js");
 favouriteSongsRepository.init(app,dbClient);
 require("./routes/favourites.js")(app,favouriteSongsRepository,songsRepository);
 require("./routes/songs.js")(app, songsRepository);
 
-
+let indexRouter = require('./routes/index');
+app.use('/', indexRouter);
 
 require("./routes/authors.js")(app);
 
@@ -75,12 +89,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const usersRepository = require("./repositories/usersRepository.js");
-usersRepository.init(app, dbClient);
-require("./routes/users.js")(app, usersRepository);
 
-let indexRouter = require('./routes/index');
-app.use('/', indexRouter);
+
+
+
 //app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
@@ -94,8 +106,8 @@ app.use(function(err, req, res, next) {
   console.log("Se ha producido un error" + err);
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
   // render the error page
+
   res.status(err.status || 500);
   res.render('error');
 });
