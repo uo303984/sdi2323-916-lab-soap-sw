@@ -36,6 +36,9 @@
 <div class="container" id="main-container"> <!-- id para identificar -->
 </div>
 <script>
+  function widgetAddSong() {
+    $("#main-container" ).load("widget-add.html");
+  }
 let token;
 let URLbase = "http://localhost:8081/api/v1.0";
 if ( Cookies.get('token') != null ){
@@ -43,23 +46,21 @@ if ( Cookies.get('token') != null ){
   $( "#main-container" ).load("widget-songs.html");
   let url = new URL(window.location.href);
   let w = url.searchParams.get("w");
-  if (w == "login") {
+  if (w === "login") {
     $("#main-container").load("widget-login.html");
   }
-  if (w == "songs") {
+  if (w === "songs") {
     $("#main-container").load("widget-songs.html");
   }
 
 }else {
-  $( "#main-container" ).load("widget-login.html");
+  $("#main-container" ).load("widget-login.html");
 }
 
 function widgetSongs() {
   $("#main-container").load("widget-songs.html");
 }
-function widgetAddSong() {
-  $( "#main-container" ).load( "widget-add.html");
-}
+
 loadSongs();
 </script>
 </body>

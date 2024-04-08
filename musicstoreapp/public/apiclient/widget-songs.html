@@ -1,5 +1,5 @@
 <div id="widget-songs" >
-  <input type="text" class="form-control" placeholder="Filtrar por nombre" id="filter-byname"/>
+  <input type="text" class="form-control" placeholder="Filtrar por nombre" id="filter-by-name"/>
   <button class="btn btn-primary" onclick="widgetAddSong()">Nueva Canción</button>
   <button class="btn" onclick="loadSongs()" >Actualizar</button>
   <table class="table table-hover">
@@ -51,9 +51,9 @@
       //la id tiene que ir entre comillas ' '
     }
   }
-  setInterval(function() {
+
     loadSongs();
-  }, 5000);
+
 
   function songDelete(_id) {
     $.ajax({

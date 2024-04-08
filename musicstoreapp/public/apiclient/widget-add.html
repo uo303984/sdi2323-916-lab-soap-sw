@@ -39,9 +39,15 @@
             headers: {"token": token},
             success: function (response) {
                 console.log(response); // <-- Prueba
+
                 $("#main-container").load("widget-songs.html");
+                $("#widget-songs")
+                    .prepend("<div class='alert alert-success'>Se ha añadido correctamente</div>");
             },
             error: function (error) {
+                console.log("hola"); // <-- Prueba
+                $("#main-container")
+                    .prepend("<div class='alert alert-danger'>Algún campo erróneo</div>");
                 $("#main-container").load("widget-login.html");
             }
         });
