@@ -1,7 +1,7 @@
-package com.example.sdixlabsoapswserver.endpoints;
-import com.example.sdixlabsoapswserver.soap.ws.GetMarksRequest;
-import com.example.sdixlabsoapswserver.soap.ws.GetMarksResponse;
-import com.example.sdixlabsoapswserver.repositories.MarksRepository;
+package com.uniovi.sdi.soap.ws.endpoints;
+import com.uniovi.sdi.soap.ws.repositories.*
+import com.uniovi.sdi.soap.ws.GetMarksRequest;
+import com.uniovi.sdi.soap.ws.GetMarksResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;

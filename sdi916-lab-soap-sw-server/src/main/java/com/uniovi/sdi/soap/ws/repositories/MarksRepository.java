@@ -1,6 +1,6 @@
-package com.example.sdixlabsoapswserver.repositories;
-import com.example.sdixlabsoapswserver.soap.ws.Mark;
-import com.example.sdixlabsoapswserver.soap.ws.User;
+package com.uniovi.sdi.repositories;
+import com.uniovi.sdi.soap.ws.Mark;
+import com.uniovi.sdi.soap.ws.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import jakarta.annotation.PostConstruct;
